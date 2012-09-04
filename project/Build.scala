@@ -1,10 +1,11 @@
 import sbt._
-import ScriptedPlugin._
+//import ScriptedPlugin._
 import Keys._
 
 import scala.xml.{Elem, Node}
 
 object ProguardPlugin extends Build {
+  /*
 	def pomPostProcessTask(node: Node) = node match {
 		case xml: Elem =>
 			val children = Seq(
@@ -36,27 +37,28 @@ object ProguardPlugin extends Build {
 			)
 		xml.copy(child = xml.child ++ children)
 	}
+	*/
 	def rootSettings: Seq[Setting[_]] = Seq(
-		scriptedBufferLog := false,
+//		scriptedBufferLog := false,
 		sbtPlugin := true,
-		projectID <<= (organization,moduleName,version,artifacts,crossPaths){ (org,module,version,as,crossEnabled) =>
-			ModuleID(org, module, version).cross(crossEnabled).artifacts(as : _*)
-		},
+//		projectID <<= (organization,moduleName,version,artifacts,crossPaths){ (org,module,version,as,crossEnabled) =>
+//			ModuleID(org, module, version).cross(crossEnabled).artifacts(as : _*)
+//		},
 		name := "xsbt-proguard-plugin",
 		organization := "com.github.siasia",
-		version <<= sbtVersion(_ + "-0.1.2"),
-		libraryDependencies += "net.sf.proguard" % "proguard-base" % "4.7",
+    version := "0.2.0",
+		libraryDependencies += "net.sf.proguard" % "proguard-base" % "4.8",
 		scalacOptions += "-deprecation",
-		publishMavenStyle := true,
-		publishTo <<= (version) {
-			version: String =>
-			val ossSonatype = "https://oss.sonatype.org/"
-			if (version.trim.endsWith("SNAPSHOT"))
-				Some("snapshots" at ossSonatype + "content/repositories/snapshots") 
-			else None
-		},
-		credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
-		pomIncludeRepository := ((_) => false),
-		pomPostProcess := (pomPostProcessTask _))
-	lazy val root = Project("root", file(".")) settings(scriptedSettings ++ rootSettings :_*)
+    // credentials are in $HOME/.sbt/... see http://www.scala-sbt.org/community-plugins.html#communityrepo
+    publishMavenStyle := false,
+    publishTo <<= (version) { version: String =>
+      val scalasbt = "http://scalasbt.artifactoryonline.com/scalasbt/"
+      val (name, url) = (version.contains("-SNAPSHOT")) match {
+        case true  => ("sbt-plugin-snapshots", scalasbt+"sbt-plugin-snapshots")
+        case false => ("sbt-plugin-releases", scalasbt+"sbt-plugin-releases")
+      }
+      Some(Resolver.url(name, new URL(url))(Resolver.ivyStylePatterns))
+    }
+	)
+	lazy val root = Project("root", file(".")) settings(/*scriptedSettings ++ */rootSettings :_*)
 }
