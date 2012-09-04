@@ -1,6 +1,8 @@
 import sbt._
 //import ScriptedPlugin._
 import Keys._
+import com.mimesis_republic.sbt.MimesisRepublicPlugin
+import MimesisRepublicPlugin._
 
 import scala.xml.{Elem, Node}
 
@@ -48,17 +50,7 @@ object ProguardPlugin extends Build {
 		organization := "com.github.siasia",
     version := "0.2.0",
 		libraryDependencies += "net.sf.proguard" % "proguard-base" % "4.8",
-		scalacOptions += "-deprecation",
-    // credentials are in $HOME/.sbt/... see http://www.scala-sbt.org/community-plugins.html#communityrepo
-    publishMavenStyle := false,
-    publishTo <<= (version) { version: String =>
-      val scalasbt = "http://scalasbt.artifactoryonline.com/scalasbt/"
-      val (name, url) = (version.contains("-SNAPSHOT")) match {
-        case true  => ("sbt-plugin-snapshots", scalasbt+"sbt-plugin-snapshots")
-        case false => ("sbt-plugin-releases", scalasbt+"sbt-plugin-releases")
-      }
-      Some(Resolver.url(name, new URL(url))(Resolver.ivyStylePatterns))
-    }
+		scalacOptions += "-deprecation"
 	)
-	lazy val root = Project("root", file(".")) settings(/*scriptedSettings ++ */rootSettings :_*)
+	lazy val root = Project("root", file(".")) settings(mimesisRepublicSettings ++ /*scriptedSettings ++ */rootSettings :_*)
 }
